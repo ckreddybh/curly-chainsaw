@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 # csv_from_table.pl
-#testing pass word less push
 use strict;
 my $html_file = shift;
 my $csv_file  = shift;
