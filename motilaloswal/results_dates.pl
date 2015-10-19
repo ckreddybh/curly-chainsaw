@@ -160,8 +160,8 @@ if($message eq '')
 open(FILE, ">$path/mail_subject_message");
 print FILE "subject: $subject\nmessage: $message";
 close FILE;
-#sendMail::sendMimeMail('chaitu949@gmail.com,ayyappa.konala@gmail.com,setmodevamsi1117@gmail.com',$subject,$message);
-sendMail::sendMimeMail('chaitu949@gmail.com',$subject,$message);
+sendMail::sendMimeMail('chaitu949@gmail.com,ayyappa.konala@gmail.com,setmodevamsi1117@gmail.com',$subject,$message);
+#sendMail::sendMimeMail('chaitu949@gmail.com',$subject,$message);
 
 
 
