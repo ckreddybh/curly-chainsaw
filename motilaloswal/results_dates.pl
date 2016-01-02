@@ -1,11 +1,15 @@
 #!/usr/bin/perl
 use POSIX qw(strftime);
-use lib "/home/ckreddy/motilaloswal";
+use lib "/home/ubuntu/curly-chainsaw/motilaloswal";
 use Date::Simple qw(date);
 use Net::SMTP;
-use LWP::Simple;
 use MIME::Lite;
+use sendMail;
 use strict;
+
+$| = 1;
+
+my $path = "/home/ubuntu/curly-chainsaw/motilaloswal";
 my %mon2num = qw(
 		jan 01  feb 02  mar 03  apr 04  may 05  jun 06
 		jul 07  aug 08  sep 09  oct 10 nov 11 dec 12
@@ -39,17 +43,17 @@ while(<$fh>)
 	my @resultdatearray;
 	my $resultdate;
 	eval{
-		if(system("curl -sS $url > /home/ckreddy/motilaloswal/usrldata.html") !=0)
+		if(system("curl -sS $url > $path/usrldata.html") !=0)
 		{
 			die "curl not sucess";
 		}
 
-		if(system("grep 'Results' /home/ckreddy/motilaloswal/usrldata.html | grep 'Result Date' | grep -oh \"<table cellpadding='0' cellspacing='0' border='0' width='100%'><tr style='height:25px;'><td  valign='middle'  class='GridHeadL RBord' style='width:60%;'>Results.*</table>\" > /home/ckreddy/motilaloswal/table.html") !=0 )
+		if(system("grep 'Results' $path/usrldata.html | grep 'Result Date' | grep -oh \"<table cellpadding='0' cellspacing='0' border='0' width='100%'><tr style='height:25px;'><td  valign='middle'  class='GridHeadL RBord' style='width:60%;'>Results.*</table>\" > $path/table.html") !=0 )
 		{
 			die "grep not sucess";
 		}
 
-		open(FILE, "</home/ckreddy/motilaloswal/table.html") || die "File not found";
+		open(FILE, "<$path/table.html") || die "File not found";
 		my @lines = <FILE>;
 		close(FILE);
 
@@ -60,16 +64,16 @@ while(<$fh>)
 			push(@newlines,$_);
 		}
 
-		open(FILE, ">/home/ckreddy/motilaloswal/table2.html") || die "File not found";
+		open(FILE, ">$path/table2.html") || die "File not found";
 		print FILE @newlines;
 		close(FILE);
 
-		if(system("grep -oh \"<table cellpadding='0' cellspacing='0' border='0' width='100%'><tr style='height:25px;'><td  valign='middle'  class='GridHeadL RBord' style='width:60%;'>Results.*</table>\" /home/ckreddy/motilaloswal/table2.html > /home/ckreddy/motilaloswal/table.html") !=0)
+		if(system("grep -oh \"<table cellpadding='0' cellspacing='0' border='0' width='100%'><tr style='height:25px;'><td  valign='middle'  class='GridHeadL RBord' style='width:60%;'>Results.*</table>\" $path/table2.html > $path/table.html") !=0)
 		{
 			die "not sucess grep 2.";
 		}
 
-		open(FILE, "</home/ckreddy/motilaloswal/table.html") || die "File not found ";
+		open(FILE, "<$path/table.html") || die "File not found ";
 		@lines = <FILE>;
 		close(FILE);
 
@@ -83,16 +87,16 @@ while(<$fh>)
 			push(@newlines,$_);
 		}
 
-		open(FILE, ">/home/ckreddy/motilaloswal/table32.html") || die "File not found";
+		open(FILE, ">$path/table32.html") || die "File not found";
 		print FILE @newlines;
 		close(FILE);
 
-		if(system("tail -1 /home/ckreddy/motilaloswal/table32.html>table.html ") !=0)
+		if(system("tail -1 $path/table32.html>$path/table.html ") !=0)
 		{
 			die "tail not sucess";
 		}
 
-		open(FILE, "</home/ckreddy/motilaloswal/table.html") || die "File not found ";
+		open(FILE, "<$path/table.html") || die "File not found ";
 		@lines = <FILE>;
 		close(FILE);
 		my $WANT = 2;
@@ -152,52 +156,14 @@ if($message eq '')
 {
 	$message = "<table border=\"2\"><body><tr><th><b>Company Name</th><th>Days Left</th><th>Result Date</th></b></tr>$message</body></table>";
 }
-sendMail('chaitu949@gmail.com,ayyappa.konala@gmail.com,setmodevamsi1117@gmail.com',$subject,$message);
-#sendMail('chaitu949@gmail.com',$subject,$message);
 
-sub send_mail {
-	my $host = "localhost";
-	my $smtp = Net::SMTP->new($host);
-	my $to = shift;
-	my $subject = shift;
-	my $message = shift;
-	my $cc;
-	my $reply_to;
-	if ($smtp) {
-		my $from_name = 'CK Reddy';
-		$smtp->mail("$from");
-		my @toArr = split (',', $to);
-		foreach(@toArr){		
-			$smtp->to("$_");
-		}
-		$smtp->data();
-		$smtp->datasend("To: $to\n");
-		$smtp->datasend("From: $from_name <$from>\n");
-		$smtp->datasend("Reply-To: $reply_to\n") if ($reply_to);
-		$smtp->datasend("Cc: $cc\n") if ($cc);
-		$smtp->datasend("Content-Type: text/html;");
-		$smtp->datasend("Subject: $subject\n");
-		$smtp->datasend("$message");
-		$smtp->datasend("\n");
-		$smtp->dataend();
-		$smtp->quit;
+open(FILE, ">$path/mail_subject_message");
+print FILE "subject: $subject\nmessage: $message";
+close FILE;
+sendMail::sendMimeMail('chaitu949@gmail.com,ayyappa.konala@gmail.com,setmodevamsi1117@gmail.com',$subject,$message);
+#sendMail::sendMimeMail('chaitu949@gmail.com',$subject,$message);
 
 
-	}
-}
 
-sub sendMail 
-{
-	my $mailto = shift;
-	my $subject = shift;
-	my $html = shift;
-		my $msg  = MIME::Lite->new(
-				From     => 'CKReddy@gmail.com',
-				To       => $mailto,
-				Type     => 'text/html',
-				Subject  => $subject,
-				Data     => $html,
-				);
 
-		$msg->send or die "couldn't send message to '$mailto'\n";
-}
+print "\nSCRIPT ENDED SUCCESSFULLY";
