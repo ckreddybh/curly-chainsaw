@@ -60,7 +60,7 @@ for key,days in sorted(final_company.items(), key=lambda x: x[1]):
 	value = key.split("|")
 	company = value[0]
 	date = value[1]
-	msg = msg+"<tr><td>"+company+"</td><td><b>"+str(days)+" days to go</b></td><td>"+date+"</td></tr>"
+	msg = msg+"<tr><td>"+company.title()+"</td><td><b>"+str(days)+" days to go</b></td><td>"+date+"</td></tr>"
 
 if msg :
 	msg = "<table border=\"2\"><body><tr><th><b>Company Name</th><th>Days Left</th><th>Result Date</th></b></tr>"+msg+"</body></table>"
@@ -69,7 +69,7 @@ else :
 
 
 print "msg ", msg
-
-sendMail("ckreddybh@gmail.com","chaitu949@gmail.com, setmodevamsi1117@gmail.com, ayyappa.konala@gmail.com",subject,msg)
+to = "chaitu949@gmail.com, setmodevamsi1117@gmail.com, ayyappa.konala@gmail.com"
+sendMail("ckreddybh@gmail.com",to,subject,msg)
 
 print "mail set ";
