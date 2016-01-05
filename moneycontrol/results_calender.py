@@ -42,7 +42,7 @@ msg = ""
 subject = "Daily Results Report ["+today.strftime("%d-%b-%Y")+"]"
 print "subject :", subject
 final_company = {}
-with open("companies_to_process.txt","r") as com:
+with open("/home/ubuntu/curly-chainsaw/moneycontrol/companies_to_process.txt","r") as com:
 	for company in com:
 		company = company.lower().strip()
 		print company
@@ -72,4 +72,4 @@ print "msg ", msg
 to = "chaitu949@gmail.com, setmodevamsi1117@gmail.com, ayyappa.konala@gmail.com"
 sendMail("ckreddybh@gmail.com",to,subject,msg)
 
-print "mail set ";
+print "mail sent ";
