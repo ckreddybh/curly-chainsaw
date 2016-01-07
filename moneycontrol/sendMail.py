@@ -8,14 +8,14 @@ from email.mime.text import MIMEText
 # me == my email address
 # you == recipient's email address
 me = "ckreddybh@gmail.com"
-to = "chaitu949@gmail.com"
+to = ["chaitu949@gmail.com"]
 def sendMail(me,to,subject,message):
 
 # Create message container - the correct MIME type is multipart/alternative.
 	msg = MIMEMultipart('alternative')
 	msg['Subject'] = subject
 	msg['From'] = me
-	msg['To'] = to
+	msg['To'] = ', '.join(to)
 	'''
 # Create the body of the message (a plain-text and an HTML version).
 	text = "Hi!\nHow are you?\nHere is the link you wanted:\nhttps://www.python.org"

@@ -69,7 +69,7 @@ else :
 
 
 print "msg ", msg
-to = "chaitu949@gmail.com, setmodevamsi1117@gmail.com, ayyappa.konala@gmail.com"
+to = ["chaitu949@gmail.com, setmodevamsi1117@gmail.com, ayyappa.konala@gmail.com"]
 sendMail("ckreddybh@gmail.com",to,subject,msg)
 
 print "mail sent ";
