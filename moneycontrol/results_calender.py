@@ -19,7 +19,7 @@ while True:
 	except Exception as e:
 		warnings.warn(e)
 	data=fh.read()
-	soup = BeautifulSoup(data)
+	soup = BeautifulSoup(data, "html5lib")
 	try:
 		nextPage = soup.find('a',class_='nxt').get("href")
 	except Exception :
