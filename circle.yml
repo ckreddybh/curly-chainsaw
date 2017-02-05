@@ -1,6 +1,6 @@
 machine:
   python:
-    version: pypy-2.7.6
+    version: pypy-2.2.1
 dependencies:
   pre:
     - pip install html5lib
