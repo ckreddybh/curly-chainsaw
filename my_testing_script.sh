@@ -1,1 +1,1 @@
-puthon ./moneycontrol/results_calender.py
+python ./moneycontrol/results_calender.py
