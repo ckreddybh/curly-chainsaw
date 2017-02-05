@@ -1,0 +1,10 @@
+machine:
+  python:
+    version: pypy-2.7.6
+dependencies:
+  pre:
+    - pip install html5lib
+    - pip install bs4
+test:
+  override:
+    - ./my_testing_script.sh
