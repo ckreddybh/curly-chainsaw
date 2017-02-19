@@ -1,3 +1,3 @@
 #!/bin/bash
 
-echo "test successful"
+python ./moneycontrol/results_calender.py
