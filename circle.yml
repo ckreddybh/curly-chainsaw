@@ -10,4 +10,4 @@ machine:
 
 dependencies:
   pre:
-    - ./my_testing_scritp.sh
+    - ./my_testing_script.sh
