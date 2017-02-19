@@ -1,10 +1,13 @@
 machine:
-  python:
-    version: pypy-2.2.1
+  pre:
+    - sudo apt-get install circleci-php-7.0.10
+  timezone:
+    Australia/Sydney
+  php:
+    version: 7.0.10
+  node:
+    version: 7.3.0
+
 dependencies:
   pre:
-    - pip install html5lib
-    - pip install bs4
-test:
-  override:
     - ./my_testing_script.sh
