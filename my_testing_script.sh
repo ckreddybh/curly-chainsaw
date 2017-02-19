@@ -26,4 +26,3 @@ git config --global user.name "CK Reddy"
 
 # phantomjs
 ./bin/phantomjs start
-
