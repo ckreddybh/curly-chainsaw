@@ -28,4 +28,4 @@ Use fixtures to load intial data:
 - for `admin` user type `1`
 - for `student` user type `2`
 - `TASK STATUS ((1, 'todo'), (2, 'doing'), (3, 'done'), (5, 'approve'), (4, 'disapprove'))`
-- every request excepts a valid username and password i.e `logid` and `logpass` should be send as along with the required params 
+- every request expect a valid username and password i.e `logid` and `logpass` should be send as along with the required params 
