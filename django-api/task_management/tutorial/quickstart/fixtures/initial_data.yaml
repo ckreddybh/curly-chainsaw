@@ -1,0 +1,57 @@
+-   "model": "quickstart.user_db"
+    "fields":
+      "username": "ck"
+      "usertype": "1"
+      "password": "e81f1c15212cf94ca3d58a1022d5dc33ab5959767be58ce5e957e9a94d170fb4d58fe1ed1831e9f7b32b1e3fd13608af5e0d2c79ee380bcf85b24ff6c5b6bd8c"
+-   "model": "quickstart.user_db"
+    "fields":
+      "username": "student"
+      "usertype": "2"
+      "password": "32ade5e7c36fa329ea39dbc352743db40da5aa7460ec55f95b999d6371ad20170094d88d9296643f192e9d5433b8d6d817d6777632e556e96e58f741dc5b3550"
+-   "model": "quickstart.user_db"
+    "fields":
+      "username": "student2"
+      "usertype": "2"
+      "password": "32ade5e7c36fa329ea39dbc352743db40da5aa7460ec55f95b999d6371ad20170094d88d9296643f192e9d5433b8d6d817d6777632e556e96e58f741dc5b3550"
+-   "model": "quickstart.user_db"
+    "fields":
+      "username": "student3"
+      "usertype": "2"
+      "password": "32ade5e7c36fa329ea39dbc352743db40da5aa7460ec55f95b999d6371ad20170094d88d9296643f192e9d5433b8d6d817d6777632e556e96e58f741dc5b3550"
+-   "model": "quickstart.user_db"
+    "fields":
+      "username": "student4"
+      "usertype": "2"
+      "password": "32ade5e7c36fa329ea39dbc352743db40da5aa7460ec55f95b999d6371ad20170094d88d9296643f192e9d5433b8d6d817d6777632e556e96e58f741dc5b3550"
+
+-   "model": "quickstart.task_table"
+    'pk': 1
+    "fields":
+      "assignee": ['student3', 'student']
+      "admin": "ck"
+      "title": "Task Management django api"
+      "status": 1
+
+-   "model": "quickstart.task_table"
+    'pk': 2
+    "fields":
+      "assignee": ['student3', 'student4']
+      "admin": "ck"
+      "title": "New api"
+      "status": 3
+
+-   "model": "quickstart.task_table"
+    'pk': 3
+    "fields":
+      "assignee": ['ck', 'student3', 'student4']
+      "admin": "ck"
+      "title": "Task 3"
+      "status": 1
+
+-   "model": "quickstart.task_table"
+    'pk': 4
+    "fields":
+      "assignee": ['ck', 'student3', 'student4']
+      "admin": "ck"
+      "title": "Task approved"
+      "status": 5

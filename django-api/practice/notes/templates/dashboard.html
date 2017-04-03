@@ -1,0 +1,15 @@
+<a href="/notes/logout">logout</a>
+<h2>Dashboard {{ user }}</h2>
+
+<form name="NoteForm" action="/notes/dashboard/" method="post">{% csrf_token %}
+{{ formset.management_form }}
+{% for form in formset %}
+{{ form.id }}
+{{ form.text }}
+{{ form.title }}
+{{ form.creaeTime }}
+{{ form.DELETE }}
+<br />
+{% endfor %}
+<input type=submit value="save note"/>
+</form>
