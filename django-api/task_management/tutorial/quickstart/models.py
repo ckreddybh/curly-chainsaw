@@ -15,7 +15,13 @@ class user_db(models.Model):
 
     @staticmethod
     def isvalid_type(user_type, error):
-        user_type = int(user_type)
+        try:
+            user_type = int(user_type)
+        except Exception:
+            error.append({'error': 'Invalid user type',
+                          'usertype_given': user_type,
+                          'valid_type': dict(USER_TYPE)})
+            return False
         valid_status = dict(USER_TYPE).get(user_type, None)
         # import pdb;pdb.set_trace()
         if valid_status:

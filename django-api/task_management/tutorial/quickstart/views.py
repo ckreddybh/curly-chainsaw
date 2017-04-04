@@ -93,11 +93,12 @@ class UserDB(View):
         error = []
         data = {
             'username': params.get('username'),
-            'usertype': params.get('usertype'),
-            'password': hashlib.sha512(params.get('password', '')).hexdigest()
+            'usertype': params.get('usertype', 2),
+            'password': params.get('password')
         }
         data_dump = None
         if user_db.isvalid_user_params(data, error):
+            data['password'] = hashlib.sha512(data['password']).hexdigest()
             obj = user_db.objects.create(**data)
             data_dump = model_to_dict(obj)
 
