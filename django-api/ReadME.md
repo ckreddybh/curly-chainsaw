@@ -31,7 +31,7 @@ Use fixtures to load intial data:
 - every request expect a valid username and password i.e `logid` and `logpass` should be send along with the required params 
 
 ## Post urls
-- `127.0.0.1:8000/task/statusupdate/` to change status update
+- `127.0.0.1:8000/task/statusupdate/` to change task status
 - `127.0.0.1:8000/task/assigneeupdate/` to add assignee you can give multiple assignees (comma separate)
 - `127.0.0.1:8000/task/assigneedelete/` to delete assignee you can give multiple assignees (comma separate)
 - `127.0.0.1:8000/task/taskdelete/` to delete a task excepts task_id

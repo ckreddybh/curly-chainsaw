@@ -334,8 +334,10 @@ class TaskView(View):
 
     @method_decorator(auth_dec_admin)
     def post(self, request):
-        params_required = {'title'}
-        params_optional = {'assignee'}
+        params_required = {
+            'title': '<title of the task>',
+        }
+        params_optional = {'assignee': 'username <if required multiple comma separated assignees>'}
         params = request.POST
         error = {}
         error_list = []
@@ -352,7 +354,7 @@ class TaskView(View):
             # import pdb;pdb.set_trace()
             error['error'] = error_list
             error['fields'] = data
-            return HttpResponse(json.dumps(error), content_type='application/json')
+            return HttpResponse(json.dumps([error, {'params_required': params_required, 'params_optional': params_optional}]), content_type='application/json')
         obj = task_table.objects.create(**data)
         # import pdb;pdb.set_trace()
         obj.save()
