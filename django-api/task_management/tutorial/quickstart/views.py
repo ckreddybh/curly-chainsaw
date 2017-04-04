@@ -12,7 +12,7 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.http import QueryDict
 from django.forms.models import model_to_dict
-from static import TASK_STATUS, USER_TYPE, ADMIN_TASK_STATUS
+from tutorial.quickstart.static import TASK_STATUS, USER_TYPE, ADMIN_TASK_STATUS
 
 
 def auth_dec_get(func):
@@ -64,10 +64,10 @@ def auth_dec_admin(func):
                 user = user_db.objects.get(username=username, password=password)
             except user_db.DoesNotExist:
                 return HttpResponse(json.dumps(
-                {'error': 'Invalid credentials, Please check logid and logpass',
-                    'logid': username,
-                    'logpass': data.get('logpass', None)}),
-                content_type='application/json')
+                    {'error': 'Invalid credentials, Please check logid and logpass',
+                        'logid': username,
+                        'logpass': data.get('logpass', None)}),
+                    content_type='application/json')
             return HttpResponse(json.dumps(
                 {'error': 'Not authorized user, User should be `admin`',
                     'logid': username,
@@ -87,65 +87,22 @@ class UserDB(View):
     def dispatch(self, request, *args, **kwargs):
         return super(UserDB, self).dispatch(request, *args, **kwargs)
 
-    @staticmethod
-    def isvalid_type(user_type, error):
-        user_type = int(user_type)
-        valid_status = dict(USER_TYPE).get(user_type, None)
-        # import pdb;pdb.set_trace()
-        if valid_status:
-            return True
-        error.append({'error': 'Invalid user type',
-                      'usertype_given': user_type,
-                      'valid_type': dict(USER_TYPE)})
-        return False
-
-    @staticmethod
-    def isvalid_field(params, error):
-        # error = []
-        if not params.get('username'):
-            print 'username'
-            return False
-        else:
-            try:
-                user_db.objects.get(username=params.get('username'))
-                print 'user already found'
-                error.append({'error': 'Invalid!!, User already exist'})
-                return None
-            except user_db.DoesNotExist as e:
-                print "user not found creating one"
-        if not params.get('password'):
-            print 'password'
-            return None
-        if not UserDB.isvalid_type(params.get('usertype'), error):
-            print 'usertype'
-            return None
-        print 'success...valid'
-        return True
-
     @method_decorator(auth_dec_admin)
     def post(self, request):
         params = request.POST
         error = []
-        # if not UserDB.isvalid_field(params, error):
-        #     params_required = {'username': '<user_id>',
-        #                        'usertype': '1 for admin 2 for student',
-        #                        'password': '<pass_for_user>'}
-        #     return HttpResponse(json.dumps(
-        #                             {'error': 'Invalid params',
-        #                              'required_params': params_required}),
-        #                         content_type='application/json')
         data = {
             'username': params.get('username'),
             'usertype': params.get('usertype'),
-            'password': hashlib.sha512(params.get('password')).hexdigest()
+            'password': hashlib.sha512(params.get('password', '')).hexdigest()
         }
         data_dump = None
-        if UserDB.isvalid_field(data, error):
+        if user_db.isvalid_user_params(data, error):
             obj = user_db.objects.create(**data)
             data_dump = model_to_dict(obj)
 
         return HttpResponse(json.dumps([error, data_dump]), content_type='application/json')
-    
+
     def get(self, request):
         objs = user_db.objects.all()
         data = []
@@ -155,100 +112,7 @@ class UserDB(View):
         return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-class static_methods():
-
-    @staticmethod
-    def isValid_assignee(assignee, error_list):
-        if not isinstance(assignee, list):
-            assignee_list = [assignee]
-        else:
-            assignee_list = assignee
-        for assignee in assignee_list:
-            try:
-                user = user_db.objects.get(username=assignee)
-            except user_db.DoesNotExist as e:
-                error_list.append({'error': 'No user exist, Assignee not found please check',
-                                  'assignee': assignee})
-                return False
-        return True
-
-    @staticmethod
-    def isvalid_field(data, assignee_list, error):
-        title = data.get('title')
-        status = data.get('status')
-        assignee_list = assignee_list
-        if not title:
-            return False
-        else:
-            if len(title) > 100:
-                error.append({'error': 'title is out of length, not more than 100 chars',
-                              'title': title})
-                return False
-                        
-        if not status:
-            return False
-        else:
-            return TaskView.isValid_status(status, error)
-        if assignee_list:
-            return static_methods.isValid_assignee(assignee_list, error)
-
-    @staticmethod
-    def getStatus(status_id):
-        return dict(TASK_STATUS).get(
-                        status_id, dict(ADMIN_TASK_STATUS).get(
-                            status_id, None))
-
-    @staticmethod
-    def isValid_status(status, error):
-
-        valid_status = dict(TASK_STATUS).get(status, None)
-        if valid_status:
-            return True
-        error.append({'error': 'Invalid status',
-                      'status_given': status,
-                      'valid_status': dict(TASK_STATUS)})
-        return False
-
-    @staticmethod
-    def get_params(request):
-        method = request.method
-        data = None
-        if method == 'POST':
-            data = request.POST
-        elif method == 'GET':
-            data = request.GET
-        else:
-            data = QueryDict(request.body)
-        return data
-
-    @staticmethod
-    def isAdmin(request):
-        params = static_methods.get_params(request)
-        try:
-            user_db.objects.get(username=params.get('logid'), usertype=1)
-            return True
-        except user_db.DoesNotExist as e:
-            return False
-
-    @staticmethod
-    def process_user_list(user_db):
-        return [x.username for x in user_db]
-
-    @staticmethod
-    def isAssignee(request, task_obj):
-        params = static_methods.get_params(request)
-        logid = request.POST.get('logid', None)
-        try:
-            assignee_list = static_methods.process_user_list(
-                task_obj.assignee.all())
-            if logid in assignee_list:
-                return True
-            return False
-        except user_db.DoesNotExist as e:
-            return False
-
-
-class TaskDelete(View, static_methods):
+class TaskDelete(View):
     @method_decorator(csrf_exempt)
     @method_decorator(auth_dec_get)
     def dispatch(self, request, *args, **kwargs):
@@ -273,30 +137,12 @@ class TaskDelete(View, static_methods):
                             content_type='application/json')
 
 
-class TaskUpdateStatus(View, static_methods):
-    
+class TaskUpdateStatus(View):
+
     @method_decorator(csrf_exempt)
     @method_decorator(auth_dec_get)
     def dispatch(self, request, *args, **kwargs):
         return super(TaskUpdateStatus, self).dispatch(request, *args, **kwargs)
-
-    @staticmethod
-    def isValid_status(status, error):
-        valid_status = dict(TASK_STATUS).get(status, None)
-        if valid_status:
-            return True
-        error.append({'error': 'Invalid status',
-                      'status_given': status,
-                      'valid_status': dict(TASK_STATUS)})
-        return False
-
-    @staticmethod
-    def is_diff_1(old_status, new_status):
-        if not dict(TASK_STATUS).get(new_status, None):
-            return False
-        if abs(old_status - new_status) <= 1:
-            return True
-        return False
 
     def post(self, request):
 
@@ -324,56 +170,56 @@ class TaskUpdateStatus(View, static_methods):
         else:
             old_status = task_obj.status
         # import pdb;pdb.set_trace()
-        if TaskView.isAdmin(request):
+        if task_table.isAdmin(request):
             if dict(ADMIN_TASK_STATUS).get(status, None) and old_status == 3:
                 task_obj.status = status
                 task_obj.save()
                 data = model_to_dict(task_obj)
                 return HttpResponse(json.dumps(
                         {'': 'Status changed successfully',
-                         'old_status': TaskUpdateStatus.getStatus(old_status),
-                         'new_status': TaskUpdateStatus.getStatus(status),
+                         'old_status': task_table.getStatus(old_status),
+                         'new_status': task_table.getStatus(status),
                          'fields': data}),
                                         content_type='application/json')
             elif dict(ADMIN_TASK_STATUS).get(status, None):
                 return HttpResponse(json.dumps(
                         {'error': 'Invalid new status',
-                         'old_status': TaskUpdateStatus.getStatus(old_status),
-                         'new_status': TaskUpdateStatus.getStatus(status),
+                         'old_status': task_table.getStatus(old_status),
+                         'new_status': task_table.getStatus(status),
                          'valid_move': 'done -> approve or done -> disapprove',
                          'params': {'optional': perams_optional,
                                     'required': params_required}}),
                                     content_type='application/json')
-        if TaskUpdateStatus.isAssignee(request, task_obj):
-            
+        if task_table.isAssignee(request, task_obj):
             # import pdb;pdb.set_trace()
             if dict(ADMIN_TASK_STATUS).get(old_status, None) and status != old_status:
                 return HttpResponse(json.dumps(
                         {'error': 'Invalid new status, you should be admin',
-                         'old_status': TaskUpdateStatus.getStatus(old_status),
-                         'new_status': TaskUpdateStatus.getStatus(status),
+                         'old_status': task_table.getStatus(old_status),
+                         'new_status': task_table.getStatus(status),
                          'valid_move': 'student can do only todo <-> doing <-> done'}),
                                     content_type='application/json')
-            if TaskUpdateStatus.is_diff_1(old_status, status):
+            if task_table.is_diff_1(old_status, status):
                 task_obj.status = status
                 task_obj.save()
                 data = model_to_dict(task_obj)
                 return HttpResponse(json.dumps(
                         {'': 'Status changed successfully',
-                         'old_status': TaskUpdateStatus.getStatus(old_status),
-                         'new_status': TaskUpdateStatus.getStatus(status),
+                         'old_status': task_table.getStatus(old_status),
+                         'new_status': task_table.getStatus(status),
                          'fields': data}),
                                         content_type='application/json')
             else:
                 return HttpResponse(json.dumps(
                         {'error': 'Invalid new status',
-                         'old_status': TaskUpdateStatus.getStatus(old_status),
-                         'new_status': TaskUpdateStatus.getStatus(status),
+                         'old_status': task_table.getStatus(old_status),
+                         'new_status': task_table.getStatus(status),
                          'valid_move': 'todo <-> doing <-> done'}),
                                     content_type='application/json')
-        if TaskView.isAdmin(request):
+        if task_table.isAdmin(request):
             return HttpResponse(json.dumps(
-                        {'error': 'Adim can approve or disapprove if he is not assignee',
+                        {'error': 'Admin can approve or disapprove if he is not assignee',
+                         'log': 'looks like sutend dint finish task wait for task to be marked as done (3)',
                          'current_user': params.get('logid', None),
                          'task_id': task_id}),
                                     content_type='application/json')
@@ -384,7 +230,7 @@ class TaskUpdateStatus(View, static_methods):
                                     content_type='application/json')
 
 
-class TaskUpdateAddAssignees(View, static_methods):
+class TaskUpdateAddAssignees(View):
     @method_decorator(csrf_exempt)
     @method_decorator(auth_dec_get)
     def dispatch(self, request, *args, **kwargs):
@@ -404,8 +250,8 @@ class TaskUpdateAddAssignees(View, static_methods):
 
         data = {'task_id': params.get('task_id', None),
                 'assignee': assignee_list}
-        if not TaskUpdateAddAssignees.isValid_assignee(assignee_list,
-                                                       error_list):
+        if not task_table.isValid_assignee(assignee_list,
+                                           error_list):
             print error
             # import pdb;pdb.set_trace()
             error['error'] = error_list
@@ -417,7 +263,7 @@ class TaskUpdateAddAssignees(View, static_methods):
         except:
             return HttpResponse(json.dumps(
                     {'error': 'No task found with the given id',
-                        'task_id_given': task_id}),
+                        'task_id_given': data.get('task_id')}),
                     content_type='application/json') 
         # import pdb;pdb.set_trace()
         # obj.save()
@@ -430,7 +276,7 @@ class TaskUpdateAddAssignees(View, static_methods):
                             content_type='application/json')
 
 
-class TaskUpdateDeleteAssignees(View, static_methods):
+class TaskUpdateDeleteAssignees(View):
     @method_decorator(csrf_exempt)
     @method_decorator(auth_dec_get)
     def dispatch(self, request, *args, **kwargs):
@@ -450,8 +296,8 @@ class TaskUpdateDeleteAssignees(View, static_methods):
 
         data = {'task_id': params.get('task_id', None),
                 'assignee': assignee_list}
-        if not TaskUpdateDeleteAssignees.isValid_assignee(assignee_list,
-                                                          error_list):
+        if not task_table.isValid_assignee(assignee_list,
+                                           error_list):
             print error
             # import pdb;pdb.set_trace()
             error['error'] = error_list
@@ -463,8 +309,8 @@ class TaskUpdateDeleteAssignees(View, static_methods):
         except:
             return HttpResponse(json.dumps(
                     {'error': 'No task found with the given id',
-                        'task_id_given': task_id}),
-                    content_type='application/json') 
+                     'task_id_given': data.get('task_id')}),
+                    content_type='application/json')
         # import pdb;pdb.set_trace()
         # obj.save()
         if assignee_list:
@@ -478,7 +324,7 @@ class TaskUpdateDeleteAssignees(View, static_methods):
                             content_type='application/json')
 
 
-class TaskView(View, static_methods):
+class TaskView(View):
 
     @method_decorator(csrf_exempt)
     @method_decorator(auth_dec_get)
@@ -500,7 +346,7 @@ class TaskView(View, static_methods):
         data = {'title': params.get('title', None),
                 'status': 1,
                 'admin_id': params.get('logid', None)}
-        if not TaskView.isvalid_field(data, assignee_list, error_list):
+        if not task_table.isvalid_field(data, assignee_list, error_list):
             print error
             # import pdb;pdb.set_trace()
             error['error'] = error_list
@@ -519,17 +365,17 @@ class TaskView(View, static_methods):
     def get(self, request):
         params = request.GET
         data = []
-        if TaskView.isAdmin(request):
+        if task_table.isAdmin(request):
             task_objs = task_table.objects.all()
             for task_obj in task_objs:
                 task_obj.save()
                 print task_obj.assignee.all()
-                status = TaskView.getStatus(task_obj.status)
+                status = task_table.getStatus(task_obj.status)
                 data.append({'task_id': task_obj.id,
                              'title': task_obj.title,
                              'status': status,
                              'admin_id': task_obj.admin_id,
-                             'assignee_id': TaskView.process_user_list(
+                             'assignee_id': task_table.process_user_list(
                                 task_obj.assignee.all())})
         else:
             # import pdb; pdb.set_trace()
@@ -537,10 +383,10 @@ class TaskView(View, static_methods):
             for task_obj in task_objs:
                 task_obj.save()
                 print task_obj.assignee.all()
-                assignee_list = TaskView.process_user_list(
+                assignee_list = task_table.process_user_list(
                                     task_obj.assignee.all())
                 if params.get('logid') in assignee_list:
-                    status = TaskView.getStatus(task_obj.status)
+                    status = task_table.getStatus(task_obj.status)
                     data.append({'task_id': task_obj.id,
                                  'title': task_obj.title,
                                  'status': status,
