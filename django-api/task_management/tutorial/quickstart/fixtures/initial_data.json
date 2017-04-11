@@ -1,0 +1,10 @@
+  [
+  {
+    "model": "quickstart.user_db",
+    "fields": {
+        "username": "ck",
+        "usertype": "1",
+        "password": "e81f1c15212cf94ca3d58a1022d5dc33ab5959767be58ce5e957e9a94d170fb4d58fe1ed1831e9f7b32b1e3fd13608af5e0d2c79ee380bcf85b24ff6c5b6bd8c"
+    }
+  }
+  ]

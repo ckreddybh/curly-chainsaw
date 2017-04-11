@@ -1,0 +1,23 @@
+<h3>Hello, {{ user | default:"World" }}!</h3>
+
+<!-- ul>
+{% for fruit in fruits %}
+<li> {{fruit}} </li>
+{% endfor %}
+</ul>
+
+{% if not user %}
+<h1>Fuck you</h1>
+{% else %}
+<h2>Eat one!!</h2>
+{% endif %} -->
+
+<form name="loginform" action="/notes/index/" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" />
+    {% for key, error in form.error.items %}
+        {{ error }}
+    {% endfor %}
+    
+
+</form>
