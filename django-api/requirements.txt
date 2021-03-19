@@ -1,4 +1,4 @@
 Django==1.9
 django-tastypie==0.13.3
-djangorestframework==3.9.1
+djangorestframework==3.11.2
 PyYAML==3.12
